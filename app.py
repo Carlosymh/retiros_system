@@ -25,7 +25,6 @@ UPLOAD_FOLDER = 'static/file/'
 
 #FUNCIONES
 
-#Direccion Principal 
 @app.route('/')
 def Index():
   try:
@@ -37,18 +36,23 @@ def Index():
     flash(str(error))
     return render_template('index.html')
 
-#Valida de usuario
-@app.route('/validar_usuario', methods=['POST'])
+#Valida el Acceso a la Plataforma 
+@app.route('/inicio', methods=['POST'])
 def validarusuaro():
-  try:
     if request.method == 'POST':
       usuario =  request.form['user']
+      return render_template('inicio.html',username=usuario,user=usuario)   
+ 
+
+#Valida de usuario
+@app.route('/validar/<usuario>', methods=['POST'])
+def validarcontrasena(usuario):
+  try:
+    if request.method == 'POST':
       clave = request.form['clave']
       link = connectBD()
-      db_connection = pymysql.connect(host=link[0], user=link[1], passwd="", db=link[2], charset="utf8", init_command="set names utf8") 
-      cur= db_connection.cursor()
       # Read a single record
-      cur.execute("SELECT * FROM roles WHERE Usuario= \'{}\' Limit 1".format(usuario))
+      db_connection = pymysql.connect(host=link[0], user=link[1], passwd="", db=link[2], charset="utf8", init_command="set names utf8") 
       data = cur.fetchone()
       cur.close()
       if data != None :
@@ -61,12 +65,10 @@ def validarusuaro():
         return redirect('/home')
       else:
         return redirect('/')
-
   except Exception as error:
     flash(str(error))
     return redirect('/')  
-
-
+#Direccion Principal 
 #Pagina Principal
 @app.route('/home',methods=['POST','GET'])
 def home():
